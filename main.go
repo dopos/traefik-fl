@@ -38,6 +38,7 @@ func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		res, _ := http.Get(*host + *url)
+		defer res.Body.Close()
 		var body fronts
 		json.NewDecoder(res.Body).Decode(&body)
 		ret := result{}
@@ -46,7 +47,7 @@ func main() {
 			for _, v1 := range v0.Routes {
 				v = append(v, strings.TrimPrefix(v1.Rule, "Host:"))
 			}
-			k := strings.Split(v0.Backend, "-")[1]
+			k := strings.TrimPrefix(v0.Backend, "backend-")
 			ret[k] = v
 		}
 		json.NewEncoder(w).Encode(ret)
